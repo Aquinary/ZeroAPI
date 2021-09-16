@@ -1,30 +1,29 @@
-
 function Z:Storage()
     local obj = {}
-
     --[[
         Постоянное хранилище, которое работает до тех пор, пока не будет выключен мод.
 
         Новый забег: данные сохраняются
         Перезапуск игры (продолжение забега): данные сохраняются
     --]]
+    local salt = 'ZeroAPI.STORAGE.PERSISTENT.' .. Z.MOD_NAME .. '.'
     obj.persistent = {
         -- Установка значения
         set = function(key, value)
-            ModSettingSet(key, value)
+            ModSettingSet(salt .. key, value)
         end,
         -- Получение значения
         get = function(key)
-            return ModSettingGet(key)
+            return ModSettingGet(salt .. key)
         end,
         -- Проверка ключа на nil
         has = function(key)
-            local _val = ModSettingGet(key)
+            local _val = ModSettingGet(salt .. key)
             return _val ~= nil and true or false
         end,
         -- Удаление значения
         remove = function(key)
-            ModSettingSet(key, nil)
+            ModSettingSet(salt .. key, nil)
         end,
     }
 
@@ -34,24 +33,25 @@ function Z:Storage()
         Новый забег: данные не сохраняются
         Перезапуск игры (продолжение забега): данные сохраняются
     --]]
+    salt = 'ZeroAPI.STORAGE.RUN.' .. Z.MOD_NAME .. '.'
     obj.run = {
         -- Установка значения
         set = function(key, value)
-            GlobalsSetValue(key, value)
+            GlobalsSetValue(salt .. key, value)
         end,
         -- Получение значения
         get = function(key)
-            local _val = GlobalsGetValue(key)
+            local _val = GlobalsGetValue(salt .. key)
             return _val ~= '' and _val or nil
         end,
         -- Проверка ключа на nil
         has = function(key)
-            local _val = GlobalsGetValue(key)
+            local _val = GlobalsGetValue(salt .. key)
             return _val ~= '' and true or false
         end,
         -- Удаление значения
         remove = function(key)
-            GlobalsSetValue(key, '')
+            GlobalsSetValue(salt .. key, '')
         end,
     }
 
@@ -61,6 +61,7 @@ function Z:Storage()
         Новый забег: данные не сохраняются
         Перезапуск игры (продолжение забега): данные не сохраняются
     --]]
+    salt = 'ZeroAPI.STORAGE.SESSION.' .. Z.MOD_NAME .. '.'
     obj.session = {
         -- Установка значения
         set = function(key, value)
