@@ -1,4 +1,4 @@
-function Z:Storage()
+function Z:Storage(mod_name)
     local obj = {}
     --[[
         Постоянное хранилище, которое работает до тех пор, пока не будет выключен мод.
@@ -6,6 +6,11 @@ function Z:Storage()
         Новый забег: данные сохраняются
         Перезапуск игры (продолжение забега): данные сохраняются
     --]]
+
+    -- Если хотим получить доступ к данным из других модов
+    Z.MOD_NAME_OLD = Z.MOD_NAME
+    Z.MOD_NAME = mod_name ~= nil and mod_name or Z.MOD_NAME
+
     local salt = 'ZeroAPI.STORAGE.PERSISTENT.' .. Z.MOD_NAME .. '.'
     obj.persistent = {
         -- Установка значения
