@@ -1,6 +1,6 @@
-Z = {}
-
-dofile('data/zero/utils.lua')
-
-dofile('data/zero/storage.lua')
-dofile('data/zero/entity.lua')
+return function(modname)
+    Z = {}
+    Z.MOD_NAME = modname
+    Z.MOD_PATH = 'mods/' .. modname .. '/'
+    dofile_once(Z.MOD_PATH .. 'data/zero/prepare.lua')
+end
