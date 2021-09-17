@@ -11,15 +11,38 @@ function Z:Storage(mod_name)
     Z.MOD_NAME_OLD = Z.MOD_NAME
     Z.MOD_NAME = mod_name ~= nil and mod_name or Z.MOD_NAME
 
+    function set_table_values(tbl)
+        if type(tbl) == 'table' then
+            local key_str = ''
+            for k, v in pairs(tbl) do
+                key_str = key_str .. '{' .. k .. '=' .. v .. '}'
+            end
+            tbl = key_str
+        end
+        return tbl
+    end
+    function get_table_values(tbl)
+        local _values = {}
+        -- если внутри ключа храним данные вида {key1=value1}{key2=value2}{key3=value3}
+        for s in string.gmatch(tbl, "{(.-)}") do
+            local _key, _value = s:match("%s*([^=]*)%s*%=%s*(.-)%s*$")
+            _values[_key] = _value
+        end
+        if next(_values) then
+            return _values
+        end
+        return tbl
+    end
+
     local salt = 'ZeroAPI.STORAGE.PERSISTENT.' .. Z.MOD_NAME .. '.'
     obj.persistent = {
         -- Установка значения
         set = function(key, value)
-            ModSettingSet(salt .. key, value)
+            ModSettingSet(salt .. key, set_table_values(value))
         end,
         -- Получение значения
         get = function(key)
-            return ModSettingGet(salt .. key)
+            return get_table_values(ModSettingGet(salt .. key))
         end,
         -- Проверка ключа на nil
         has = function(key)
@@ -42,11 +65,11 @@ function Z:Storage(mod_name)
     obj.run = {
         -- Установка значения
         set = function(key, value)
-            GlobalsSetValue(salt .. key, value)
+            GlobalsSetValue(salt .. key, set_table_values(value))
         end,
         -- Получение значения
         get = function(key)
-            local _val = GlobalsGetValue(salt .. key)
+            local _val = get_table_values(GlobalsGetValue(salt .. key))
             return _val ~= '' and _val or nil
         end,
         -- Проверка ключа на nil
@@ -87,5 +110,13 @@ function Z:Storage(mod_name)
         end,
     }
 
+    --[[
+        Защита от записи из других модов
+    --]]
+    function obj.readonly(bool)
+
+    end
+
+    Z.MOD_NAME = Z.MOD_NAME_OLD
     return setmetatable(obj, {__index = self})
 end
