@@ -1515,6 +1515,18 @@ function Z:Entity(entity)
     return setmetatable(obj, {__index = self})
 end
 
+function Z:EntityCreate(name)
+    --[[
+        Создаёт новую сущность
+
+        name: имя сущности
+
+        Возвращает объект класса Z:Entity
+    --]]
+
+    return Z:Entity(EntityCreateNew(name))
+end
+
 function Z:Player()
     return Z:Entity(EntityGetWithTag('player_unit')[1])
 end
