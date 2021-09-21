@@ -1358,6 +1358,15 @@ function Z:Entity(entity)
         end
     }
 
+    local function _normaline_name_component(name)
+        --[[
+            Нормализует имя компонента для возможности использования короткой записи
+        --]]
+        if not name:find('Component') then
+            name = name .. 'Component' -- при использовании записи без 'Component' на конце добавляем это слово
+        end
+        return name
+    end
     local function _get_component(name, tag)
         --[[
             Получает компонент у сущности
@@ -1445,7 +1454,7 @@ function Z:Entity(entity)
                 value: таблица со значениями
                 tag: тег компонента
             --]]
-            local component = EntityAddComponent(entity, name)
+            local component = EntityAddComponent(entity, _normaline_name_component(name))
 
             if tag then
                 ComponentAddTag(component, tag)
@@ -1460,7 +1469,7 @@ function Z:Entity(entity)
                 name: имя получаемого компонента
                 tag: тег компонента
             --]]
-            return _get_component_fields(_get_component(name, tag))
+            return _get_component_fields(_get_component(_normaline_name_component(name), tag))
         end,
         foreach = function(name, fn)
             --[[
@@ -1469,7 +1478,7 @@ function Z:Entity(entity)
                 name: название компонетов
                 fn: функция, в которой происходит взаимодействие с полями компонента
             --]]
-            local components = EntityGetComponent(entity, name)
+            local components = EntityGetComponent(entity, _normaline_name_component(name))
             for i, comp in ipairs(components) do
                 local vars = _get_component_fields(comp)
                 -- встроенные поля для каких-либо действий
@@ -1493,7 +1502,7 @@ function Z:Entity(entity)
                 value: таблица со значениями
                 tag: тег компонента
             --]]
-            local component = _get_component(name, tag)
+            local component = _get_component(_normaline_name_component(name), tag)
             if component ~= nil then -- проверяем, существует ли компонент
                 _edit_component(component, value)
             end
@@ -1505,7 +1514,7 @@ function Z:Entity(entity)
                 name: имя компонента
                 tag: тег компонента
             --]]
-            local component = _get_component(name, tag)
+            local component = _get_component(_normaline_name_component(name), tag)
             if component ~= nil then
                 EntityRemoveComponent(entity, component)
             end
@@ -1528,5 +1537,10 @@ function Z:EntityCreate(name)
 end
 
 function Z:Player()
+    --[[
+        Возвращает объект класса Z:Entity для текущего игрока
+    --]]
     return Z:Entity(EntityGetWithTag('player_unit')[1])
 end
+
+
